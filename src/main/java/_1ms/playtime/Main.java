@@ -17,9 +17,6 @@
 package _1ms.playtime;
 
 import _1ms.BuildConstants;
-import _1ms.playtime.Commands.ConfigReload;
-import _1ms.playtime.Commands.PlaytimeCommand;
-import _1ms.playtime.Commands.PlaytimeResetAll;
 import _1ms.playtime.Commands.PlaytimeTopCommand;
 import _1ms.playtime.Handlers.CacheHandler;
 import _1ms.playtime.Handlers.ConfigHandler;
@@ -28,8 +25,6 @@ import _1ms.playtime.Handlers.UpdateHandler;
 import _1ms.playtime.Listeners.PlaytimeEvents;
 import _1ms.playtime.Listeners.RequestHandler;
 import com.google.inject.Inject;
-import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.Subscribe;
@@ -57,20 +52,20 @@ import java.util.concurrent.TimeUnit;
         id = "velocityplaytime",
         name = "VelocityPlaytime",
         version = BuildConstants.VERSION,
-        authors = "_1ms",
+        authors = "_1ms, tanczikmate",
         description = "Playtime logger for velocity"
 )
 @SuppressWarnings("unused")
 public class Main {
     public ConfigHandler configHandler;
-    public PlaytimeCommand playtimeCommand;
+
     public CacheHandler cacheHandler;
     public PlaytimeEvents playtimeEvents;
     public PlaytimeTopCommand playtimeTopCommand;
     public RequestHandler requestHandler;
-    public ConfigReload configReload;
+
     public UpdateHandler updateHandler;
-    public PlaytimeResetAll playtimeResetAll;
+
     public MySQLHandler mySQLHandler;
     public final MinecraftChannelIdentifier MCI = MinecraftChannelIdentifier.from("velocity:playtime");
 
@@ -81,13 +76,9 @@ public class Main {
         configHandler = new ConfigHandler(this);
         mySQLHandler = new MySQLHandler(configHandler, this);
         cacheHandler = new CacheHandler(this, configHandler);
-        playtimeCommand = new PlaytimeCommand(this, configHandler, cacheHandler);
         playtimeEvents = new PlaytimeEvents(this, configHandler);
-        playtimeTopCommand = new PlaytimeTopCommand(this, configHandler);
         requestHandler = new RequestHandler(this, playtimeTopCommand, configHandler);
-        configReload = new ConfigReload(configHandler);
         updateHandler = new UpdateHandler(this);
-        playtimeResetAll = new PlaytimeResetAll(this, configHandler);
     }
 
     public final HashMap<String, Long> playtimeCache = new HashMap<>();
@@ -183,35 +174,7 @@ public class Main {
                 .buildTask(this, this::countPT)
                 .repeat(1L, TimeUnit.SECONDS)
                 .schedule();
-//Register cmds
-        CommandManager commandManager = proxy.getCommandManager();
-        CommandMeta commandMeta = commandManager.metaBuilder(configHandler.getPTN())
-                .aliases(configHandler.getPTA())
-                .plugin(this)
-                .build();
-        SimpleCommand simpleCommand = playtimeCommand;
-        commandManager.register(commandMeta, simpleCommand);
 
-        CommandMeta commandMeta2 = commandManager.metaBuilder(configHandler.getPTTN())
-                .aliases(configHandler.getPTTA())
-                .plugin(this)
-                .build();
-        SimpleCommand simpleCommand2 = playtimeTopCommand;
-        commandManager.register(commandMeta2, simpleCommand2);
-
-        CommandMeta commandMeta3 = commandManager.metaBuilder(configHandler.getPTRLN())
-                .aliases(configHandler.getPTRLA())
-                .plugin(this)
-                .build();
-        SimpleCommand simpleCommand3 = configReload;
-        commandManager.register(commandMeta3, simpleCommand3);
-
-        CommandMeta commandMeta4 = commandManager.metaBuilder(configHandler.getPTRAN())
-                .aliases(configHandler.getPTRAA())
-                .plugin(this)
-                .build();
-        SimpleCommand simpleCommand4 = playtimeResetAll;
-        commandManager.register(commandMeta4, simpleCommand4);
 //Send restart packet to PlaytimeLink.
         requestHandler.sendRS();
 
