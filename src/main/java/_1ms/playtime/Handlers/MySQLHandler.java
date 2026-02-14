@@ -34,10 +34,22 @@ public class MySQLHandler {
 
     public Connection conn;
     public boolean openConnection() {
-        final String url = "jdbc:mariadb://" + configHandler.getADDRESS() +":" + configHandler.getPORT() + "/" + configHandler.getDB_NAME() + "?user=" + configHandler.getUSERNAME() + "&password=" + configHandler.getPASSWORD() + "&driver=org.mariadb.jdbc.Driver";
         try {
-            conn = DriverManager.getConnection(url);
-            conn.createStatement().execute("CREATE TABLE IF NOT EXISTS playtimes (name VARCHAR(20) PRIMARY KEY, time BIGINT NOT NULL)");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ignored) {}
+
+        final String url = String.format(
+                "jdbc:mysql://%s:%s/%s?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
+                configHandler.getADDRESS(),
+                configHandler.getPORT(),
+                configHandler.getDB_NAME()
+        );
+
+        try {
+            conn = DriverManager.getConnection(url, configHandler.getUSERNAME(), configHandler.getPASSWORD());
+            try (Statement s = conn.createStatement()) {
+                s.execute("CREATE TABLE IF NOT EXISTS playtimes (name VARCHAR(20) PRIMARY KEY, time BIGINT NOT NULL)");
+            }
         } catch (SQLException e) {
             main.getLogger().error("Error while connecting to the database: {}", e.getMessage());
             return false;
