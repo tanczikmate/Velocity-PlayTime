@@ -200,7 +200,10 @@ public class PlaytimeCommand implements SimpleCommand {
             return;
         }
         final long PlayTime = main.playtimeCache.get(player.getUsername());
-        player.sendMessage(configHandler.decideNonComponent(configHandler.repL(configHandler.getYOUR_PLAYTIME(), PlayTime).replace("%place%", String.valueOf(main.getPlace(player.getUsername())))));
+        player.sendMessage(configHandler.decideNonComponent(configHandler.repL(configHandler.getYOUR_PLAYTIME(), PlayTime)
+                .replace("%place%", String.valueOf(main.getPlace(player.getUsername())))
+                .replace("%player%", player.getUsername())
+        ));
     }
 
     @Override
