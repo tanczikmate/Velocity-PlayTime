@@ -191,27 +191,28 @@ public class Main {
                 .build();
         SimpleCommand simpleCommand = playtimeCommand;
         commandManager.register(commandMeta, simpleCommand);
-
+        /*
         CommandMeta commandMeta2 = commandManager.metaBuilder(configHandler.getPTTN())
                 .aliases(configHandler.getPTTA())
                 .plugin(this)
                 .build();
         SimpleCommand simpleCommand2 = playtimeTopCommand;
         commandManager.register(commandMeta2, simpleCommand2);
-
+        */
         CommandMeta commandMeta3 = commandManager.metaBuilder(configHandler.getPTRLN())
                 .aliases(configHandler.getPTRLA())
                 .plugin(this)
                 .build();
         SimpleCommand simpleCommand3 = configReload;
         commandManager.register(commandMeta3, simpleCommand3);
-
+        /*
         CommandMeta commandMeta4 = commandManager.metaBuilder(configHandler.getPTRAN())
                 .aliases(configHandler.getPTRAA())
                 .plugin(this)
                 .build();
         SimpleCommand simpleCommand4 = playtimeResetAll;
         commandManager.register(commandMeta4, simpleCommand4);
+        */
 //Send restart packet to PlaytimeLink.
         requestHandler.sendRS();
 

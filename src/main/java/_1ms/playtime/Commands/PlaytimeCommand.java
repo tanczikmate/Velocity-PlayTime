@@ -54,21 +54,28 @@ public class PlaytimeCommand implements SimpleCommand {
                 SendYourPlaytime(player);
             }
             case 1 -> {
-                if(sender instanceof Player player)
-                    if(player.getUsername().equalsIgnoreCase(args[0])) {
+                String targetName = args[0];
+
+                if(sender instanceof Player player) {
+                    // Saját név mindig sajátját adja
+                    if(player.getUsername().equalsIgnoreCase(targetName)) {
                         SendYourPlaytime(player);
                         return;
                     }
-                if(configHandler.isVIEW_OTHERS_TIME() && !sender.hasPermission("vpt.getotherstime")) {
-                    sender.sendMessage(configHandler.getNO_PERMISSION());
-                    return;
+
+                    // Ha nincs joga másét nézni → sajátját adja
+                    if(configHandler.isVIEW_OTHERS_TIME() && !sender.hasPermission("vpt.getotherstime")) {
+                        SendYourPlaytime(player);
+                        return;
+                    }
                 }
-                long PlayTime = main.playtimeCache.containsKey(args[0]) ? main.playtimeCache.get(args[0]) : main.getSavedPt(args[0]);
+                long PlayTime = main.playtimeCache.containsKey(targetName) ? main.playtimeCache.get(targetName) : main.getSavedPt(targetName);
                 if (PlayTime == -1)
                     sender.sendMessage(configHandler.getNO_PLAYER());
                 else
-                    sender.sendMessage(configHandler.decideNonComponent(configHandler.repL(configHandler.getOTHER_PLAYTIME(), PlayTime).replace("%player%", args[0]).replace("%place%", String.valueOf(main.getPlace(args[0])))));
+                    sender.sendMessage(configHandler.decideNonComponent(configHandler.repL(configHandler.getOTHER_PLAYTIME(), PlayTime).replace("%player%", targetName).replace("%place%", String.valueOf(main.getPlace(targetName)))));
             }
+            /*
             case 3 -> {
                 if(!sender.hasPermission("vpt.modify")) {
                     sender.sendMessage(configHandler.getNO_PERMISSION());
@@ -155,6 +162,7 @@ public class PlaytimeCommand implements SimpleCommand {
                     }
                 }
             }
+            */
             default -> sender.sendMessage(configHandler.getINVALID_ARGS());
         }
     }
@@ -222,20 +230,27 @@ public class PlaytimeCommand implements SimpleCommand {
         if (target.length == 1) {
             // First argument tab completion
             final String prefix = target[0].toLowerCase();
+            /*
             if(sender.hasPermission("vpt.modify")){
                 if ("add".startsWith(prefix)) tabargs.add("add");
                 if ("sub".startsWith(prefix)) tabargs.add("sub");
                 if ("set".startsWith(prefix)) tabargs.add("set");
             }
+             */
             for (Player player : main.getProxy().getAllPlayers())
                 if (player.getUsername().toLowerCase().startsWith(prefix))
                     tabargs.add(player.getUsername());
-        } else if (target.length == 2 && (target[0].equalsIgnoreCase("add") || target[0].equalsIgnoreCase("sub") || target[0].equalsIgnoreCase("set")) && sender.hasPermission("vpt.modify")) {
+        }
+
+        /*
+        else if (target.length == 2 && (target[0].equalsIgnoreCase("add") || target[0].equalsIgnoreCase("sub") || target[0].equalsIgnoreCase("set")) && sender.hasPermission("vpt.modify")) {
             // Second argument tab completion for specific first arguments
             for (Player player : main.getProxy().getAllPlayers())
                 if (player.getUsername().toLowerCase().startsWith(target[1].toLowerCase()))
                     tabargs.add(player.getUsername());
         }
+
+         */
         return CompletableFuture.completedFuture(tabargs);
     }
 }
